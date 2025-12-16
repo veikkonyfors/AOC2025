@@ -23,6 +23,6 @@ def test_grid():
     
 def test_day4():
     assert day4.day4("input_test") == 13
-    #assert day4.day4("input_test", 2) == 3121910778619
+    assert day4.day4("input_test", 2) == 43
     assert day4.day4("input") == 1409
-    #assert day4.day4("input", 2) == 173848577117276
+    assert day4.day4("input", 2) == 8366
