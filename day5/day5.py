@@ -11,15 +11,10 @@ class Fresh():
 
     for line in fresh_lines:
       start, end = line.split('-')
-      #print(start, end)
       if int(start) <= int(end): # Skip start > end ranges
-        #print(f"add: start: {start}, end: {end}")
         self.fresh_set.add((int(start),int(end)))
-        #print(f"fresh_set in if: {self.fresh_set}")
-        self.fresh_list = list(self.fresh_set)
-        #print(f"fresh_list: {self.fresh_list}")
 
-    #print(f"fresh_set after init: {self.fresh_set}")
+    self.fresh_list = list(self.fresh_set)
 
   def __str__(self):
       # Järjestetään setti listaksi ennen tulostusta, jotta se on luettava
@@ -43,27 +38,27 @@ class Fresh():
     return freshones
 
   def count_fresh_ids2(self):
-    print(f"In: count_fresh_ids2")
-    freshones = 0
-    print(f"len(self.fresh_set): {len(self.fresh_set)}")
-    if len(self.fresh_set) > 1:
-      print(f"In: if len(self.fresh_set) > 1:")
-      for i, (start, end) in enumerate(self.fresh_list[:-1]):
-        # if either is inside the other, remove insider
-        # latter inside previous
-        if start <= self.fresh_list[i+1][0] and end >= self.fresh_list[i+1][0]:
-          #del self.fresh_set[i]
-          self.fresh_list.remove(i+1)
-        # former inside latter
-        elif start >= self.fresh_list[i+1][0] and end <= self.fresh_list[i+1][0]:
-          #del self.fresh_set[i+1]
-          self.fresh_list.remove(i)
+      if not self.fresh_list:
+          return 0
 
-    for r in self.fresh_set:
-      freshones += r[1] - r[0] + 1
+      self.fresh_list.sort(key=lambda x: x[0])
 
-    return freshones
+      merged = [self.fresh_list[0]]
 
+      for current in self.fresh_list[1:]:
+          prev_start, prev_end = merged[-1]
+          current_start, current_end = current
+
+          if current_start <= prev_end:
+              merged[-1] = (prev_start, max(prev_end, current_end))
+          else:
+              merged.append(current)
+
+      freshones = 0
+      for r in merged:
+          freshones += r[1] - r[0] + 1
+
+      return freshones
 
 def day5(input: str, part=1):
     lines = read_input(input)
@@ -77,13 +72,12 @@ def day5(input: str, part=1):
       return fresh.count_fresh_ids(available_ids)
 
     if part == 2:
-      fresh = Fresh(fresh_lines, 2)
+      fresh = Fresh(fresh_lines)
       return fresh.count_fresh_ids2()
 
 
 if __name__ == '__main__':
     print(f"{day5('input_test')}")
     print(f"{day5('input')}")
-    #print(f"{day4('input_test', 2)}")
-    #print(f"{day4('input')}")
-    #print(f"{day4('input', 2)}")
+    print(f"{day5('input_test', 2)}")
+    print(f"{day5('input', 2)}")
